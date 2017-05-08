@@ -12,6 +12,8 @@ import sys
 from time import time
 sys.path.append("../tools/")
 from email_preprocess import preprocess
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
 
 
 ### features_train and features_test are the features for the training
@@ -25,6 +27,35 @@ features_train, features_test, labels_train, labels_test = preprocess()
 #########################################################
 ### your code goes here ###
 
+# Toggle to reduce training set
+small_set = False
+if small_set:
+    features_train = features_train[:len(features_train) / 100]
+    labels_train = labels_train[:len(labels_train) / 100]
+
+# Create classifier
+C_params = [10000]
+
+for C_param in C_params:
+    print "##########"
+    print "C parameter", C_param
+    train_st = time()
+    clf = SVC(kernel="rbf", C=C_param)
+    clf.fit(features_train, labels_train)
+    print "training time:", round(time()-train_st, 3), "s"
+
+    # Make predictions
+    test_st = time()
+    pred = clf.predict(features_test)
+    print "testing time:", round(time()-test_st, 3), "s"
+
+    # Judge the accuracy
+    acc = accuracy_score(pred, labels_test)
+    print acc
+
+    # Show some results
+    print len(pred)
+    print sum(pred)
 #########################################################
 
 
