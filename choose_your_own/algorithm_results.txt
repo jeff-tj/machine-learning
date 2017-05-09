@@ -1,0 +1,38 @@
+### Algorithm testing results
+
+# K-nearest neighbour, n=5, uniform
+training time: 0.002 s
+testing time: 0.002 s
+0.92
+
+# K-nearest neighbour, n=5, distance
+training time: 0.001 s
+testing time: 0.002 s
+accuracy 0.932
+
+# K-nearest neighbour, n=15, uniform
+training time: 0.001 s
+testing time: 0.003 s
+accuracy 0.928
+
+# K-nearest neighbour, n=15, distance
+Starting process
+training time: 0.001 s
+testing time: 0.003 s
+accuracy 0.94
+
+# K-nearest neighbour, n=50, uniform
+training time: 0.001 s
+testing time: 0.005 s
+accuracy 0.928
+
+# K-nearest neighbour, n=50, distance
+training time: 0.001 s
+testing time: 0.004 s
+accuracy 0.928
+
+# We can see that the decision boundary becomes less complex for higher n as 
+we are doing less over-fitting, that can be a goood thing, but for very high 
+values of n we will go too far and have an overly generalised surface.
+
+

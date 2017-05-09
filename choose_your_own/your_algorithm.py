@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 from prep_terrain_data import makeTerrainData
 from class_vis import prettyPicture
+from time import time
 
 features_train, labels_train, features_test, labels_test = makeTerrainData()
 
@@ -24,21 +25,46 @@ plt.scatter(grade_slow, bumpy_slow, color = "r", label="slow")
 plt.legend()
 plt.xlabel("bumpiness")
 plt.ylabel("grade")
-plt.show()
+#plt.show()
 ################################################################################
 
 
 ### your code here!  name your classifier object clf if you want the 
 ### visualization code (prettyPicture) to show you the decision boundary
+print "Starting process"
 
+# Choose classifier
+from sklearn.metrics import accuracy_score
+algo_choice = "k_nearest"
 
+if algo_choice == "k_nearest":
+    # K-nearest neighbor
+    # n_neighbors - no neighbors to consider, weights is the weighting
+    # uniform - all equal weights; distance - inversely proportional
+    from sklearn import neighbors
+    clf = neighbors.KNeighborsClassifier(n_neighbors=50, weights="uniform")
+elif algo_choice == "random_forest":
+    pass
+elif algo_choice == "adaboost":
+    pass
+else:
+    print "No algorithm chosen"
 
+# Fit data
+train_st = time()
+clf.fit(features_train, labels_train)
+print "training time:", round(time()-train_st, 3), "s"
 
-
-
-
+# Test classifier
+test_st = time()
+pred = clf.predict(features_test)
+print "testing time:", round(time()-test_st, 3), "s"
+acc = accuracy_score(labels_test, pred)
+print "accuracy", round(acc, 4)
 
 try:
     prettyPicture(clf, features_test, labels_test)
 except NameError:
     pass
+
+plt.show()
