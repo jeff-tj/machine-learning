@@ -35,7 +35,7 @@ print "Starting process"
 
 # Choose classifier
 from sklearn.metrics import accuracy_score
-algo_choice = "k_nearest"
+algo_choice = "random_forest"
 
 if algo_choice == "k_nearest":
     # K-nearest neighbor
@@ -44,7 +44,11 @@ if algo_choice == "k_nearest":
     from sklearn import neighbors
     clf = neighbors.KNeighborsClassifier(n_neighbors=50, weights="uniform")
 elif algo_choice == "random_forest":
-    pass
+    # Random forest classifier
+    # n_estimators - number of trees
+    # min_samples_split - smallest sample size
+    from sklearn.ensemble import RandomForestClassifier
+    clf = RandomForestClassifier(n_estimators=50, min_samples_split=25)
 elif algo_choice == "adaboost":
     pass
 else:
