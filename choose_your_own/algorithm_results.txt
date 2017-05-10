@@ -35,4 +35,42 @@ accuracy 0.928
 we are doing less over-fitting, that can be a goood thing, but for very high 
 values of n we will go too far and have an overly generalised surface.
 
+# Random forest, n=10, min=2
+training time: 0.041 s
+testing time: 0.007 s
+accuracy 0.928
 
+# Random forest, n=50, min=2
+training time: 0.156 s
+testing time: 0.028 s
+accuracy 0.916
+
+# Random forest, n=100, min=2
+training time: 0.301 s
+testing time: 0.055 s
+accuracy 0.92
+
+# Random forest, n=10, min=15
+training time: 0.034 s
+testing time: 0.008 s
+accuracy 0.908
+
+# Random forest, n=10, min=25
+training time: 0.036 s
+testing time: 0.007 s
+accuracy 0.924
+
+# Adaboost, n=50
+training time: 0.116 s
+testing time: 0.004 s
+accuracy 0.924
+
+# Adaboost, n=100
+training time: 0.269 s
+testing time: 0.009 s
+accuracy 0.924
+
+# Adaboost, n=500
+training time: 1.3 s
+testing time: 0.042 s
+accuracy 0.912

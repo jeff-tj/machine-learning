@@ -35,8 +35,9 @@ print "Starting process"
 
 # Choose classifier
 from sklearn.metrics import accuracy_score
-algo_choice = "random_forest"
+algo_choice = "adaboost"
 
+clf_select = True
 if algo_choice == "k_nearest":
     # K-nearest neighbor
     # n_neighbors - no neighbors to consider, weights is the weighting
@@ -50,21 +51,26 @@ elif algo_choice == "random_forest":
     from sklearn.ensemble import RandomForestClassifier
     clf = RandomForestClassifier(n_estimators=50, min_samples_split=25)
 elif algo_choice == "adaboost":
-    pass
+    # Adaboost classifier
+    # n_estimators - the maximum number of est (def = 50)
+    from sklearn.ensemble import AdaBoostClassifier
+    clf = AdaBoostClassifier(n_estimators=100)
 else:
     print "No algorithm chosen"
+    clf_select = False
 
-# Fit data
-train_st = time()
-clf.fit(features_train, labels_train)
-print "training time:", round(time()-train_st, 3), "s"
+if clf_select:
+    # Fit data
+    train_st = time()
+    clf.fit(features_train, labels_train)
+    print "training time:", round(time()-train_st, 3), "s"
 
-# Test classifier
-test_st = time()
-pred = clf.predict(features_test)
-print "testing time:", round(time()-test_st, 3), "s"
-acc = accuracy_score(labels_test, pred)
-print "accuracy", round(acc, 4)
+    # Test classifier
+    test_st = time()
+    pred = clf.predict(features_test)
+    print "testing time:", round(time()-test_st, 3), "s"
+    acc = accuracy_score(labels_test, pred)
+    print "accuracy", round(acc, 4)
 
 try:
     prettyPicture(clf, features_test, labels_test)
