@@ -8,7 +8,7 @@
 
 
 import pickle
-import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("../tools/")
@@ -81,9 +81,18 @@ except NameError:
 
 # qn on exercised_stock-options
 if True:
-    ex_opt_val = []
+    temp_arr = []
+    feature_index = 1
     for f_array in finance_features:
-        if f_array[1] != 0:
-            ex_opt_val.append(f_array[1])
-    print "min opt val = ", min(ex_opt_val)
-    print "max opt val = ", max(ex_opt_val)
+        if f_array[feature_index] != 0:
+            temp_arr.append(f_array[feature_index])
+    print "min opt val = ", min(temp_arr)
+    print "max opt val = ", max(temp_arr)
+    # scaling part of the course
+    from sklearn.preprocessing import MinMaxScaler
+
+    min_max_scaler = MinMaxScaler()
+    temp_rescaled = min_max_scaler.fit_transform(temp_arr)
+    test_value = 1000000.0
+    print min_max_scaler.transform(np.array([[test_value]]))
+
