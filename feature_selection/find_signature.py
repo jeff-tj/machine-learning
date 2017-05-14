@@ -51,8 +51,12 @@ print "acc (test) = ", clf.score(features_test, labels_test)
 
 # extract the most important feature
 importance = clf.feature_importances_
-imp_high_n = np.argsort(np.asarray(importance))[-1]
-imp_high_val = importance[imp_high_n]
-print imp_high_n
-print imp_high_val
-print vectorizer.get_feature_names()[imp_high_n]
+imp_high_n = np.argsort(np.asarray(importance))[-11:]
+#imp_high_val = importance[imp_high_n]
+#print imp_high_n
+#print imp_high_val
+feature_list = vectorizer.get_feature_names()
+n = len(imp_high_n)
+for i in imp_high_n:
+    print n, ": ", importance[i], " ", feature_list[i], ", index: ", i
+    n -= 1
