@@ -50,7 +50,7 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
         email_text = parseOutText(email)
         ### use str.replace() to remove any instances of the words
         ### ["sara", "shackleton", "chris", "germani"]
-        key_words = ["sara", "shackleton", "chris", "germani"]
+        key_words = ["sara", "shackleton", "chris", "germani", "sshacklensf"]
         for key_word in key_words:
             email_text = email_text.replace(key_word, "")
         ### append the text to word_data

@@ -2,6 +2,7 @@
 
 import pickle
 import numpy
+from time import time
 numpy.random.seed(42)
 
 
@@ -38,6 +39,20 @@ labels_train   = labels_train[:150]
 
 
 ### your code goes here
+from sklearn import tree
+import numpy as np
+# setup decision tree classifier
+start_t = time()
+clf = tree.DecisionTreeClassifier()
+clf.fit(features_train, labels_train)
+print "run time: ", round(time() - start_t, 3), "s"
+print "acc (training) = ", clf.score(features_train, labels_train)
+print "acc (test) = ", clf.score(features_test, labels_test)
 
-
-
+# extract the most important feature
+importance = clf.feature_importances_
+imp_high_n = np.argsort(np.asarray(importance))[-1]
+imp_high_val = importance[imp_high_n]
+print imp_high_n
+print imp_high_val
+print vectorizer.get_feature_names()[imp_high_n]
