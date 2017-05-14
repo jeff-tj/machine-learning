@@ -1,0 +1,109 @@
+Using Gaussian Naive Bayes from sklearn
+
+classifier = GaussianNB()
+classifier.fit(features, labels)
+classifier.predict(new_data)
+
+Gauging accuracy
+
+accuracy = clf.score(features_test, labels_test)
+
+Support Vector Machines
+Outputs a line that separates two sets of data ("hyperplane")
+Best line - maximises the line between the nearest point on the data
+("margin")
+Large margin makes your results robust.
+However SVM will always attempt to classify all correctly, then
+optimises to the contrainst to maximise margin.
+
+#
+Some other notes here
+#
+
+Regressions - Continuous Supervised Learning
+
+from sklearn import linear_model
+clf = linear_model.LinearRegression()
+
+predict always looks for a list - single value as a list
+.score() - gives the r-squared
+test data set gives a sense of whether we have over-fitted
+In general, give statistics on the test set
+
+Optimising linear regression
+*OLS
+*gradient-descent
+
+Outliers
+Detecting outliers with an iterative process:
+1) Train your line of best fit
+2) Remove points that have the highest errors 
+3) Train again
+[Repeat 2 and 3 if desired]
+Outliers are good indicators of fraud and anomalies
+
+### Unsupervised Learning - Clustering ###
+*K-Means algorithms
+Algorithm works by first picking random cluster means
+1) Assigns - by drawing orthoganal lines (perpendicular bisectors)
+Then points belong in each region specified
+2) Optimises - minimise the total quadratic error 
+(i.e. move the cluster centers around)
+You then repeat to assign the points to the new cluster centers
+This should coverge.
+However in almost uniform data - the initial placement is very
+important. Therefore you initialise multiple times and average the position
+Limitations:
+* Answers are not always the same - dependent on initial conditions
+* Can find local minimums "hill-climbing algorithsm" - have to be aware
+Therefore runalgorithm multiple times
+
+As we can see with 3 features - the algorithm can identify patterns that are
+not otherwise visible in 2D.
+
+### Feature Scaling ###
+Rescale with x' = (x - x_min) / (x_max - x_min)
+Note - MinMaxScaler requires each input to be an array itself.
+i.e. we need an array of arrays
+Feature scaling is valuable where you are making a trade off in one 
+dimension against another one.
+
+### Learning from Text ###
+Use bag of words to account for differing string lengths
+Frequency dictionary
+use:
+from sklearn.feature_extraction.text import CountVectorizer
+.vocabulary_.text - to return word of that feature
+stopwords - common words of low information value
+NLTK - National Language Toolkit for stopwords
+from nltk.corpus import stopwords
+sw = stopwords.words("english")
+[first time use nltk.download()]
+stemmer strips down words to a stem
+(Best to use an off the shelf stemmer done by a linguist)
+e.g.
+from nltk.stem.snowball import SnowballStemmer
+stemmer = SnowballStemmer("english")
+Use it to clean up your set and reduce the dimensions
+
+Order of Operations in Text Processing
+TfIdf: Tf - term frequency; Idf - inverse document frequency
+Idf - weighting inversely by how often the words occur in corpus as a whole
+
+### Feature Selection ###
+SelectPercentile - only keeps the bottom x% of features that explain
+differences
+TfIdf Vectorizer can also select features by discarding words with a 
+document frequency higher than max_df
+High Bias - pays little attention to the data (high error on test set)
+High Varaince - too much attention to the data (overfitting)
+High Variance have better training performance than test performance.
+Bias-Variance Dilemma.
+
+Regularization - can optimise choose the number of features (maximise
+the quality of the model)
+Lasso Regression: lambda parameter is a penalty term for too many variables
+Note - we have multiple by beta - coefficients of the regression, therefore
+important to ensure they are of similar magnitude.
+minimise SSE + lambda * |beta_n|
+(Supervised learning - i.e. pass features and labels)
