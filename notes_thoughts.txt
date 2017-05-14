@@ -107,3 +107,18 @@ Note - we have multiple by beta - coefficients of the regression, therefore
 important to ensure they are of similar magnitude.
 minimise SSE + lambda * |beta_n|
 (Supervised learning - i.e. pass features and labels)
+
+### PCA ###
+* Moves the centre to the centre of your data
+* Makes the x-axis the axis that explains the most variation (relative
+to the rest of the data)
+* And subsequent axes in the order of how much variance is explains
+
+* "spread" value that explains the importance of each axis
+* latent variables - can't be measured directly, but pca can expose
+* projection on maximum variance keeps the most "information"
+* unsupervised learning technique, in addition to dimensionality reduction
+
+* selecting principal components
+* don't perform feature selection BEFORE pca, pca does dimensionality
+reduction
