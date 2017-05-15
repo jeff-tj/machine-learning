@@ -122,3 +122,11 @@ to the rest of the data)
 * selecting principal components
 * don't perform feature selection BEFORE pca, pca does dimensionality
 reduction
+
+### Cross Validation ###
+from sklearn.cross_validation import train_test_split
+simplifies splitting the data (could obviously use indices)
+
+k-fold cross validation - spearate your data in k bins, use one as the training
+and run the test on the rest of the data
+from sklearn.cross_validations import Kfold
