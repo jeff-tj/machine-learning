@@ -130,3 +130,22 @@ simplifies splitting the data (could obviously use indices)
 k-fold cross validation - spearate your data in k bins, use one as the training
 and run the test on the rest of the data
 from sklearn.cross_validations import Kfold
+
+### Evaluation Metrics ###
+Other measures - given that there may be other objectives to achieve.
+Confusion matrices
+Recall - the probability given that it is supplied with class A, will
+correctly identify it as class A. TP / (TP + FN)
+Precision - the probability given that it says it is class A, it is class A
+TP / (TP + FP)
+For skewed data sets - can get high accuracy by just guessing the most common
+
+* Training, Transforming, Predicting
+1) train-test split
+2) pca
+- pca.fit(training_features)
+- pca.transform(training_features)
+- clf.train(training_features)
+3) clf
+- pca.transform(test_features)
+- clf.predict(test_features)
