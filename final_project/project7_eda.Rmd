@@ -1,0 +1,109 @@
+---
+title: "project7_ml"
+author: "Jeff Tjeuw"
+date: "11/06/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We first take the enron financial data that we extracted as a csv.
+
+List here of the features in the csv.
+extract_features = ["poi",
+                    "salary",
+                    "deferral_payments",
+                    "total_payments",
+                    "loan_advances",
+                    "bonus",
+                    "restricted_stock_deferred",
+                    "deferred_income",
+                    "total_stock_value",
+                    "expenses",
+                    "exercised_stock_options",
+                    "other",
+                    "long_term_incentive",
+                    "restricted_stock",
+                    "director_fees"]
+
+```{r import_data, echo=FALSE}
+setwd(
+  "~/data_research/u_machine_learning/ud120-projects/final_project")
+enron_fin_data <- read.csv(
+  "enron_financial_features.csv", header=FALSE)
+my_headings <- c("poi",
+                 "salary",
+                 "deferral_payments",
+                 "total_payments",
+                 "loan_advances",
+                 "bonus",
+                 "restricted_stock_deferred",
+                 "deferred_income",
+                 "total_stock_value",
+                 "expenses",
+                 "exercised_stock_options",
+                 "other",
+                 "long_term_incentive",
+                 "restricted_stock",
+                 "director_fees")
+names(enron_fin_data) <- my_headings
+head(enron_fin_data)
+# Remove the totals row from our data
+tot_r = which.max(enron_fin_data$salary)
+enron_fin_data <- enron_fin_data[-c(tot_r),]
+```
+
+## Function to Plot 2 Variables with POIs Shown
+Create a function to plot POIs - to save time
+```{r plot_function, echo=FALSE}
+plot_pairs <- function(var1, var2){
+  ggplot(enron_fin_data, aes_string(x = var1, y = var2)) +
+    geom_point(aes(color = factor(poi))) +
+    scale_color_manual(values = c("black", "red"))
+}
+```
+Generate a selection of plots
+```{r create_plots, echo=FALSE}
+plot_pairs("salary", "bonus")
+```
+* Neither value appears to give much
+
+```{r}
+plot_pairs("deferral_payments", "total_payments")
+```
+* POIs seem to have almost no deferral_payments - this could be a hint that there is a POI.
+
+```{r}
+plot_pairs("total_payments", "loan_advances")
+```
+* Ken Lay's outrageous loans stands out, however nothing else for the rest of the POIs.
+* For the next graph however it may be useful to restrict the axes.
+
+```{r}
+plot_pairs("restricted_stock_deferred", "deferred_income")
+```
+* No clear relationship stands out, however it does look like we have one bad data point - the positive value for restricted_stock_deferred. Looking into the original data - all the values are negative. Interestingly no POI had any restricted_stock_deferred.
+
+```{r}
+plot_pairs("total_stock_value", "expenses")
+```
+* No clear relationships stand out.
+
+```{r}
+plot_pairs("exercised_stock_options", "other")
+```
+* There does not appear to be any clear relationships here.
+
+```{r}
+plot_pairs("long_term_incentive", "restricted_stock")
+```
+* In the graph of restricted_stock vs long_term_incentive hints at a possible relationship.The red POI points seem to line up on an axis. Initially this could make sense as persons with a larger proportion of their compensation tied up in restricted_stock have an incentive to keep the fraud going.
+
+```{r}
+plot_pairs("total_payments", "director_fees")
+```
+* From the last graph we can straight away rule out director_fees as a field for identifying POIs. It appears most of the independent directors that received fees were not involved in the fraud perpetuated.
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
