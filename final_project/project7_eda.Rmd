@@ -68,7 +68,7 @@ Generate a selection of plots
 ```{r create_plots, echo=FALSE}
 plot_pairs("salary", "bonus")
 ```
-* Neither value appears to give much
+* Neither value appears to give much information on its own, however taken as a ratio this may provide more information.
 
 ```{r}
 plot_pairs("deferral_payments", "total_payments")
@@ -106,4 +106,95 @@ plot_pairs("total_payments", "director_fees")
 ```
 * From the last graph we can straight away rule out director_fees as a field for identifying POIs. It appears most of the independent directors that received fees were not involved in the fraud perpetuated.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Features for Further Investigation
+* restricted_stock
+* long_term_incentive
+* salary
+* bonus
+* exercised_stock_options
+* total_stock_value
+* deferred_income
+* total_payments
+This is after ruling out a few that seem unlikely to be of interest. The next approach might be to take the absolute skew out of the numbers (something that we saw worked well when dealing with emails) and take values as a ratio - this will tend to but the numbers into similar orders of magnitude.
+
+Given that the fraud involved creating ficticious and inflated asset values to keep the company "afloat", one could assume that the POIs engaged in the fraud would have been aware of this. Therefore they would have known that the company did not have sufficient cash. Therefore they would have eschewed cash payments in exchange for stock. We test this theory out by creating a ratio of total_stock_value to total_payments ratio.
+
+```{r}
+enron_fin_data$stock_payment_ratio <- 
+  enron_fin_data$total_stock_value / enron_fin_data$total_payments
+ggplot(enron_fin_data, aes(x = stock_payment_ratio)) +
+  geom_dotplot(aes(color = factor(poi))) +
+  scale_color_manual(values = c("black", "red"))
+```
+
+```{r}
+plot_pairs("stock_payment_ratio", "total_payments")
+```
+Initial plots don't look promising. However we see that this could be blown out by extremely small denominators. We investigate what it looks like when we investigate stock payments as a percentage of total payments.
+```{r}
+enron_fin_data$stock_percentage <- enron_fin_data$total_stock_value / 
+  (enron_fin_data$total_stock_value + enron_fin_data$total_payments)
+plot_pairs("stock_percentage", "total_payments")
+```
+Again the results do not look very promising.
+
+We go back to some of the other visually identified ratios:
+```{r}
+enron_fin_data$rs_lti_ratio <- enron_fin_data$restricted_stock /
+  enron_fin_data$long_term_incentive
+plot_pairs("rs_lti_ratio", " total_payments")
+```
+```{r}
+enron_fin_data$deferral_ratio <- enron_fin_data$deferral_payments / 
+  enron_fin_data$total_payments
+plot_pairs("deferral_ratio", "rs_lti_ratio")
+```
+```{r}
+plot_pairs("exercised_stock_options", "bonus")
+```
+
+```{r}
+enron_fin_data$bonus_percentage <- enron_fin_data$bonus / 
+  (enron_fin_data$bonus + enron_fin_data$salary)
+enron_fin_data$exe_opt_percentage <- enron_fin_data$exercised_stock_options / 
+  (enron_fin_data$total_stock_value)
+plot_pairs("bonus_percentage", "exe_opt_percentage")
+```
+
+```{r}
+plot_pairs("bonus_percentage", "stock_percentage")
+```
+Here we start to see a possible cluster emerge - the red dots are largely concentrated to the right of the graph.
+
+Maybe we consider non-financial payments as well.
+```{r}
+enron_fin_data$non_salary_percent <-
+  1 - enron_fin_data$salary / enron_fin_data$total_payments
+plot_pairs("non_salary_percent", "bonus_percentage")
+```
+```{r}
+plot_pairs("non_salary_percent", "exe_opt_percentage")
+```
+```{r}
+plot_pairs("non_salary_percent", "total_stock_value")
+```
+```{r}
+enron_fin_data$stock_salary_ratio <-
+  enron_fin_data$total_stock_value / enron_fin_data$salary
+plot_pairs("stock_salary_ratio", "non_salary_percent") +
+  scale_x_continuous(limits = c(0, 150))
+```
+POIs have high non-salary percentages, but so do many people.
+```{r}
+plot_pairs("non_salary_percent", "total_stock_value")
+```
+```{r}
+enron_fin_data$non_salary_payments <-
+  enron_fin_data$total_payments - enron_fin_data$salary
+plot_pairs("non_salary_payments", "total_stock_value") +
+  scale_x_continuous(limits = c(0, 12500000)) +
+  scale_y_continuous(limits = c(0, 12500000))
+```
+Focus on a second dimension in addtion to non_salary_percent
+
+
