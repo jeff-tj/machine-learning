@@ -48,6 +48,7 @@ my_headings <- c("poi",
                  "long_term_incentive",
                  "restricted_stock",
                  "director_fees")
+library(ggplot2)
 names(enron_fin_data) <- my_headings
 head(enron_fin_data)
 # Remove the totals row from our data
@@ -197,4 +198,8 @@ plot_pairs("non_salary_payments", "total_stock_value") +
 ```
 Focus on a second dimension in addtion to non_salary_percent
 
+```{r}
+enron_fin_data$bs_ratio <- enron_fin_data$bonus/enron_fin_data$salary
+plot_pairs("exercised_stock_options", "bs_ratio")
+```
 
