@@ -3,6 +3,7 @@
 import sys
 import pickle
 sys.path.append("../tools/")
+from sklearn import tree
 
 from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
@@ -31,7 +32,10 @@ email_features = ["to_messages",
                   "from_messages",
                   "from_this_person_to_poi",
                   "shared_receipt_with_poi"]
-features_list = ["poi","salary"] # You will need to use more features
+features_list = ["poi",
+                 "bonus",
+                 "salary",
+                 "from_this_person_to_poi_ratio"]
 
 ### Load the dictionary containing the dataset
 with open("final_project_dataset.pkl", "r") as data_file:
@@ -41,6 +45,29 @@ with open("final_project_dataset.pkl", "r") as data_file:
 ### Task 3: Create new feature(s)
 ### Store to my_dataset for easy export below.
 my_dataset = data_dict
+
+# Feature that expresses emails to/from poi as a ratio of total emails
+# Where there is no feature we save "NaN" as per featureFormat
+for person in my_dataset.keys():
+    person_data = my_dataset[person]
+    # Create ratio for received messages
+    if person_data["to_messages"] != 0 and person_data["to_messages"] != "NaN":
+        if person_data["from_poi_to_this_person"] != "NaN":
+            person_data["from_poi_to_this_person_ratio"] = (
+                person_data["from_poi_to_this_person"] / float(person_data["to_messages"]))
+        else:
+            person_data["from_poi_to_this_person_ratio"] = "NaN"
+    else:
+        person_data["from_poi_to_this_person_ratio"] = "NaN"
+    # Create ratio for from messages
+    if person_data["from_messages"] != 0 and person_data["from_messages"] != "NaN":
+        if person_data["from_this_person_to_poi"] != "NaN":
+            person_data["from_this_person_to_poi_ratio"] = (
+                person_data["from_this_person_to_poi"] / float(person_data["from_messages"]))
+        else:
+            person_data["from_this_person_to_poi_ratio"] = "NaN"
+    else:
+        person_data["from_this_person_to_poi_ratio"] = "NaN"
 
 ### Extract features and labels from dataset for local testing
 data = featureFormat(my_dataset, features_list, sort_keys = True)
@@ -53,8 +80,7 @@ labels, features = targetFeatureSplit(data)
 ### http://scikit-learn.org/stable/modules/pipeline.html
 
 # Provided to give you a starting point. Try a variety of classifiers.
-from sklearn.naive_bayes import GaussianNB
-clf = GaussianNB()
+clf = tree.DecisionTreeClassifier(criterion="entropy", min_samples_split=15)
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
 ### using our testing script. Check the tester.py script in the final project
