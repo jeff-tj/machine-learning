@@ -69,6 +69,12 @@ for person in my_dataset.keys():
     else:
         person_data["from_this_person_to_poi_ratio"] = "NaN"
 
+# Correct errors in "restricted_stock_deferred"
+error_dict = {"BELFER ROBERT": "-44093",
+              "BHATNAGAR SANJAY": "-2604490"}
+for person in error_dict.keys():
+    my_dataset[person]["restricted_stock_deferred"] = error_dict[person]
+
 ### Extract features and labels from dataset for local testing
 data = featureFormat(my_dataset, features_list, sort_keys = True)
 labels, features = targetFeatureSplit(data)
