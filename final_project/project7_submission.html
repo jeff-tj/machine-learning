@@ -11753,10 +11753,10 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Free-Response-Answers">Free Response Answers<a class="anchor-link" href="#Free-Response-Answers">&#182;</a></h2><ol>
 <li><p>The Enron case was at the time America's largest corporate fraud - such a scheme could not have resuted without a group of people deliberately misleading people. The goal of the project was to train a machine learning algorithm over the data available to identify Persons of Interest (POIs) from a dataset that included financial data and email data from the investigation. Here we had many different fields and so the advatage of a machine learnign algortihm is its ability to find patterns in the data in many dimensions - we then are able to leverage those patterns and apply them to new datasets.</p>
-<p>On an initial explatory data analysis (EDA) sweep of the data, we see the data scraping process has picked up the "TOTAL" row in the data - this is an outlier that we remove. After removing this we see that we are left with 149 people. However we have no data for "Eugene E Lockhart" - he is not a POI however. We could delete him from the dataset as well, however since he has no values - he will be removed by the featureFormat function. This leaves us with 148 persons, with 18 POIs.</p>
+<p>On an initial explatory data analysis (EDA) sweep of the data, we see the data scraping process has picked up the "TOTAL" row in the data - this is an outlier that we remove. After removing this we see that we are left with 149 people. However we have no data for "Eugene E Lockhart" - he is not a POI however. We could delete him from the dataset as well, however since he has no values - he will be removed by the featureFormat function. This leaves us with 148 persons, with 18 POIs. I ended up using 3 features: "bonus", "salary", "from_this_person_to_poi_ratio". We count the NaNs for each field: "bonus" has  64, "salary" 51 and "from_this_person_to_poi_ratio" has 59. These counts are quite a high proportion of our data.</p>
 </li>
-<li><p>The feature that was added to the data set was to express emails to and from POIs as a ratio of total emails to and from the person. This was becasue our inital EDA showed that absolute values of emails were not very helpful - but when scaled to be expressed as a proportion of that persons's total email count, the ratio was more useful.</p>
-<p>While some initial EDA was done, this would not be very efficient as we would be limited to looking at 2 features compared against each other at a time. Therefore we used a SelectKBest in conjunction with GridSearchCV to select the best features. SelectKBest returned:</p>
+<li><p>The feature that was added to the data set was to express emails to and from POIs as a ratio of total emails to and from the person. This was becasue our inital EDA showed that absolute values of emails were not very helpful - but when scaled to be expressed as a proportion of that persons's total email count, the ratio was more useful. These can be found under the dictionary keys: "from_poi_to_this_person_ratio" and "from_this_person_to_poi_ratio". We can see below that the "from_this_person_to_poi_ratio" was ranked by SelectKBest as the third best feature - so outperforming all other features apart from "bonus" and "salary".</p>
+<p>While some initial EDA was done, this would not be very efficient as we would be limited to looking at 2 features compared against each other at a time. Therefore we used a SelectKBest in conjunction with GridSearchCV to select the best features. SelectKBest was one of the steps fed into the GridSearchCV pipeline. The number of features (k) was then set as one of the parameters in the GridSearchCV to try all combinations of features. The best performing pipeline used 3 features - therefore we selected the top 3 ranked features. The SelectKBest ranking of features:</p>
 <blockquote><p>('bonus', 30.652282305660439)<br>
 ('salary', 15.806090087437418)<br>
 ('from_this_person_to_poi_ratio', 13.791413236761116)<br>
@@ -11775,12 +11775,34 @@ div#notebook {
 </blockquote>
 <p>Feature scaling was used in the pipeline as we were testing algorithms that were variance dependent (e.g. SVC). However, in my final submission this was not used as algorithm settled on (decision tree) does not require scaling of features.</p>
 </li>
-<li><p>The algorithm settled on was using a decision tree as a classifier. Other algorithms tried include: naive Bayes, support vector classifiers and k-nearest neighbours. While all algortihms delivered a similar amount of accuracy, I found that the decision tree classifier performed best at recognising POIs in the data - this was an important consideration as the number of POIs in the dataset was low.</p>
+<li><p>The algorithm settled on was using a decision tree as a classifier. Other algorithms tried include: naive Bayes, support vector classifiers and k-nearest neighbours. Below we show the results of the optimal configurations found by GridSearchCV:</p>
+<blockquote><p>Results for gaussian
+Test size: 44 Number of test POIs: 5
+Accuracy:  0.840909090909
+Recall:  0.2
+Precision:  0.25<br>
+Results for decision_tree
+Test size: 44 Number of test POIs: 5
+Accuracy:  0.840909090909
+Recall:  0.6
+Precision:  0.375<br>
+Results for svm
+Test size: 44 Number of test POIs: 5
+Accuracy:  0.863636363636
+Recall:  0.0
+Precision:  0.0<br>
+Results for k_neighbours
+Test size: 44 Number of test POIs: 5
+Accuracy:  0.886363636364
+Recall:  0.2
+Precision:  0.5</p>
+</blockquote>
+<p>While all algortihms delivered a similar amount of accuracy, I found that the decision tree classifier performed best at recognising POIs in the data - this was an important consideration as the number of POIs in the dataset was low.</p>
 </li>
 <li><p>Tuning the parameters of an algorithm refers to determining how the algorithm makes decisions on how to classify the data points. When it comes to the decision that the algorithm makes around how to classify points, we are trying to balance the trade-off between bias and variance. If the algorithm is not properly tuned it may be hgihly biased - that is it will apply rules too generally and miss intricacies in the data. On the other hand, if tuned to finely to the parameters of the training set, the algorithm may only be alble to make good decions on data it has already seen. In both cases, we will get poor performance on a new test dataset - therefore we tune the algorithm to be responsive enough to unique cases in the data, while being able to perform well on new data sets it has not yet seen.</p>
-<p>For the decision tree, I ended up tuning the criterion and min_sample_split parameter. The criterion parameter determines how the algorithm makes a split - here we ended up specifying "entropy" so the algorithm makes it's decision to maximise information gain. min_sample_split determines the minimum number of samples that will allow the algortihm to split a node - if this is too small we can lead the algorithm to have high variance (i.e. it will overfit the training set), however if too high the bias of the algorithm will be too high. In tuning our algorithm we first used GridSearchCV to automate the process to find the best candidate. We then manually adjusted the, min_sample_split to give better results.</p>
+<p>For the decision tree, I ended up tuning the criterion and min_sample_split parameter. The criterion parameter determines how the algorithm makes a split - here we ended up specifying "entropy" so the algorithm makes it's decision to maximise information gain. min_sample_split determines the minimum number of samples that will allow the algortihm to split a node - if this is too small we can lead the algorithm to have high variance (i.e. it will overfit the training set), however if too high the bias of the algorithm will be too high. In tuning our algorithm we first used GridSearchCV to automate the process to find the best candidate. We then manually adjusted the, min_sample_split to give better results (here we accepted reduced accuracy for slightly high recall).</p>
 </li>
-<li><p>Validation involves running the algorithm on a test data set that it has not seen before. Without validation we could have overfit our model to training data without the algorithm being able to make accurate predictions on new data. Here validation is achieved by splitting out data into training and testing sets, and then we measure the algorithm's performance on the testing set.</p>
+<li><p>Validation involves running the algorithm on a different validation data set, before it is run on the test data set. Without validation we could have overfit our model to training data without the algorithm being able to make accurate predictions on new data - the validation step is a check on how well the algorithm performs on different data. Here validation is achieved by splitting out data into training and validation sets using the train_test_split function. We our split is 70:30 training to validation. We can then use the validation step to tune the parameters of our algorithm. Here (as explained above) we use GridSearchCV to run cross-validation to help us find the initial parameters, before we manually tune the parameters ourselves (since we are happy to manually adjust parameters to account for the accuracy vs. recall tradeoff).</p>
 </li>
 <li><p>In the analysis I used the following evaluation metrics:</p>
 <ul>
@@ -12337,6 +12359,19 @@ KbiLiMTQ/wfWgxLUk02RzQAAAABJRU5ErkJggg==
     <span class="k">if</span> <span class="ow">not</span> <span class="n">has_value</span><span class="p">:</span>
         <span class="k">print</span> <span class="s2">&quot;Name: </span><span class="si">%s</span><span class="s2">, POI: </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">person</span><span class="p">,</span> <span class="n">person_data</span><span class="p">[</span><span class="s2">&quot;poi&quot;</span><span class="p">])</span>
         <span class="c1">#print person_data</span>
+
+<span class="c1"># Audit our data fields:</span>
+<span class="n">feature_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">features_list</span><span class="p">:</span>
+    <span class="n">feature_dict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">my_dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">person_data</span> <span class="o">=</span> <span class="n">my_dataset</span><span class="p">[</span><span class="n">person</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">features_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">person_data</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;NaN&quot;</span><span class="p">:</span>
+            <span class="n">feature_dict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="k">print</span> <span class="s2">&quot;Number of NaNs per field&quot;</span>
+<span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">features_list</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> : </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">feature_dict</span><span class="p">[</span><span class="n">field</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -12354,6 +12389,23 @@ Sample: 144
 Number of POIs: 18
 The following has no values
 Name: LOCKHART EUGENE E, POI: False
+Number of NaNs per field
+poi : 0
+salary : 51
+deferral_payments : 107
+loan_advances : 142
+bonus : 64
+restricted_stock_deferred : 128
+deferred_income : 97
+total_stock_value : 20
+expenses : 51
+exercised_stock_options : 44
+other : 53
+long_term_incentive : 80
+restricted_stock : 36
+director_fees : 129
+from_poi_to_this_person_ratio : 59
+from_this_person_to_poi_ratio : 59
 </pre>
 </div>
 </div>
@@ -12496,23 +12548,23 @@ Name: LOCKHART EUGENE E, POI: False
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Best results for gaussian
-Pipeline(steps=[(&#39;select&#39;, SelectKBest(k=1, score_func=&lt;function f_classif at 0x11cc946e0&gt;)), (&#39;scaler&#39;, MinMaxScaler(copy=True, feature_range=(0, 1))), (&#39;clf&#39;, GaussianNB(priors=None))])
+Pipeline(steps=[(&#39;select&#39;, SelectKBest(k=1, score_func=&lt;function f_classif at 0x10f16e6e0&gt;)), (&#39;scaler&#39;, MinMaxScaler(copy=True, feature_range=(0, 1))), (&#39;clf&#39;, GaussianNB(priors=None))])
 *****
 Best results for decision_tree
-Pipeline(steps=[(&#39;select&#39;, SelectKBest(k=3, score_func=&lt;function f_classif at 0x11cc946e0&gt;)), (&#39;scaler&#39;, MinMaxScaler(copy=True, feature_range=(0, 1))), (&#39;clf&#39;, DecisionTreeClassifier(class_weight=None, criterion=&#39;entropy&#39;, max_depth=None,
+Pipeline(steps=[(&#39;select&#39;, SelectKBest(k=3, score_func=&lt;function f_classif at 0x10f16e6e0&gt;)), (&#39;scaler&#39;, MinMaxScaler(copy=True, feature_range=(0, 1))), (&#39;clf&#39;, DecisionTreeClassifier(class_weight=None, criterion=&#39;entropy&#39;, max_depth=None,
             max_features=None, max_leaf_nodes=None,
             min_impurity_split=1e-07, min_samples_leaf=1,
             min_samples_split=30, min_weight_fraction_leaf=0.0,
             presort=False, random_state=None, splitter=&#39;best&#39;))])
 *****
 Best results for svm
-Pipeline(steps=[(&#39;select&#39;, SelectKBest(k=1, score_func=&lt;function f_classif at 0x11cc946e0&gt;)), (&#39;scaler&#39;, MinMaxScaler(copy=True, feature_range=(0, 1))), (&#39;clf&#39;, SVC(C=3, cache_size=200, class_weight=None, coef0=0.0,
+Pipeline(steps=[(&#39;select&#39;, SelectKBest(k=1, score_func=&lt;function f_classif at 0x10f16e6e0&gt;)), (&#39;scaler&#39;, MinMaxScaler(copy=True, feature_range=(0, 1))), (&#39;clf&#39;, SVC(C=3, cache_size=200, class_weight=None, coef0=0.0,
   decision_function_shape=None, degree=3, gamma=&#39;auto&#39;, kernel=&#39;rbf&#39;,
   max_iter=-1, probability=False, random_state=None, shrinking=True,
   tol=0.001, verbose=False))])
 *****
 Best results for k_neighbours
-Pipeline(steps=[(&#39;select&#39;, SelectKBest(k=1, score_func=&lt;function f_classif at 0x11cc946e0&gt;)), (&#39;scaler&#39;, MinMaxScaler(copy=True, feature_range=(0, 1))), (&#39;clf&#39;, KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
+Pipeline(steps=[(&#39;select&#39;, SelectKBest(k=1, score_func=&lt;function f_classif at 0x10f16e6e0&gt;)), (&#39;scaler&#39;, MinMaxScaler(copy=True, feature_range=(0, 1))), (&#39;clf&#39;, KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
            metric_params=None, n_jobs=1, n_neighbors=7, p=2,
            weights=&#39;uniform&#39;))])
 *****
@@ -12948,9 +13000,9 @@ oaAkIiKJoaAkIiKJoaAkIiKJ8f8BENGlWtFgDEYAAAAASUVORK5CYII=
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Accuracy:  0.840909090909
-Recall:  0.4
-Precision:  0.333333333333
+<pre>Accuracy:  0.863636363636
+Recall:  0.6
+Precision:  0.428571428571
 </pre>
 </div>
 </div>
